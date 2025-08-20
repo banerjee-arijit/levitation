@@ -84,7 +84,7 @@ const AddProductPage = () => {
           <ProductTable />
         </div>
 
-        <div className="flex justify-center mt-10">
+        <div className="flex justify-center mt-10 mb-20">
           <Button
             onClick={handleGeneratePDF}
             className="text-[#CCF575] bg-[#303030] w-full sm:w-[436px] h-[45px] rounded-sm flex items-center gap-2 hover:bg-[#CCF575] hover:text-[#141414] transition-all duration-300"

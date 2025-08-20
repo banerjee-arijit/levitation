@@ -3,7 +3,7 @@ import loginImage from "@/assets/loginPageImage.png";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, Meta } from "react-router-dom";
 
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
@@ -12,11 +12,13 @@ const RegistrationPage = () => {
     password: "",
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const nameRegex = /^[a-zA-Z ]{2,30}$/;
@@ -40,8 +42,28 @@ const RegistrationPage = () => {
       return;
     }
 
-    console.log("Registering user:", formData);
-    // Call API or further logic here
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (

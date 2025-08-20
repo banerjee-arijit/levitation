@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import sliderImageOne from "@/assets/sliderImageOne.png";
 import sliderImageTwo from "@/assets/sliderImageTwo.png";
+import { useNavigate } from "react-router-dom";
 
 const images = [sliderImageOne, sliderImageTwo];
 
 const LoginPage = () => {
   const [current, setCurrent] = useState(0);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,6 +45,7 @@ const LoginPage = () => {
 
     console.log("Login data:", formData);
     // Proceed with API call or further logic
+    navigate("/add_product");
   };
 
   return (
