@@ -23,8 +23,26 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleLogin = () => {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      alert(
+        "Password must be at least 6 characters long and include at least 1 letter and 1 number.",
+      );
+      return;
+    }
+
     console.log("Login data:", formData);
+    // Proceed with API call or further logic
   };
 
   return (
@@ -67,7 +85,7 @@ const LoginPage = () => {
               </p>
             </div>
 
-            <form className="space-y-6 z-50">
+            <form className="space-y-6 z-50" onSubmit={handleLogin}>
               <div>
                 <Label htmlFor="email" className="text-white text-sm">
                   Email Address
@@ -100,14 +118,12 @@ const LoginPage = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-                <Link to="/add_product">
-                  <Button
-                    onClick={handleLogin}
-                    className="bg-[#303030] text-[#CCF575] w-full sm:w-[120px] h-[50px] rounded-[4px] hover:bg-[#CCF575] hover:text-[#141414] transition-all duration-300"
-                  >
-                    Login now
-                  </Button>
-                </Link>
+                <Button
+                  type="submit"
+                  className="bg-[#303030] text-[#CCF575] w-full sm:w-[120px] h-[50px] rounded-[4px] hover:bg-[#CCF575] hover:text-[#141414] transition-all duration-300"
+                >
+                  Login now
+                </Button>
                 <Link
                   to="/forgot-password"
                   className="text-[#B8B8B8] text-sm hover:text-white transition md:mb-0 mb-10"

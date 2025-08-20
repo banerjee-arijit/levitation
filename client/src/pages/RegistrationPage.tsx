@@ -16,8 +16,32 @@ const RegistrationPage = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleRegister = () => {
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const nameRegex = /^[a-zA-Z ]{2,30}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+    if (!nameRegex.test(formData.name)) {
+      alert("Please enter a valid name (only letters, 2-30 characters).");
+      return;
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      alert(
+        "Password must be at least 6 characters long and include at least 1 letter and 1 number.",
+      );
+      return;
+    }
+
     console.log("Registering user:", formData);
+    // Call API or further logic here
   };
 
   return (
@@ -35,7 +59,7 @@ const RegistrationPage = () => {
                 This is a basic signup page which is used for levitation assignment purpose.
               </p>
             </div>
-            <form className="space-y-6 z-50">
+            <form className="space-y-6 z-50" onSubmit={handleRegister}>
               <div>
                 <Label htmlFor="name" className="text-white text-sm">
                   Full Name
@@ -86,7 +110,7 @@ const RegistrationPage = () => {
               </div>
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
                 <Button
-                  onClick={handleRegister}
+                  type="submit"
                   className="bg-[#303030] text-[#CCF575] w-[120px] h-[50px] rounded-[4px] hover:bg-[#CCF575] hover:text-[#141414] transition-all duration-300"
                 >
                   Register
