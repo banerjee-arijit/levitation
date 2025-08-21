@@ -1,18 +1,41 @@
 import { useState, useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import ProductForm from "@/components/ProductForm";
 import ProductTable from "@/components/ProductTable";
 import InvoicePreview from "@/components/InvoicePreview";
 import { Button } from "@/components/ui/button";
 
-const AddProductPage = () => {
+interface InvoiceProduct {
+  name: string;
+  qty: number;
+  rate: string; // must match InvoicePreview
+  total: string;
+}
+
+interface User {
+  username: string;
+  email: string;
+}
+
+interface InvoiceData {
+  name: string;
+  date: string;
+  email: string;
+  products: InvoiceProduct[];
+  totalCharges: string;
+  gst: string;
+  totalAmount: string;
+}
+
+const AddProductPage: React.FC = () => {
   const [showInvoice, setShowInvoice] = useState(false);
-  const [invoiceData, setInvoiceData] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const API_URL = import.meta.env.VITE_API_URL;
-  const token = localStorage.getItem("token");
+  const API_URL = import.meta.env.VITE_API_URL as string;
+  const token = localStorage.getItem("token") || "";
 
+  // Fetch logged-in user
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -20,22 +43,19 @@ const AddProductPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        if (res.ok) {
-          setUser(data.user);
-        } else {
-          toast.error(data.message || "Failed to fetch user");
-        }
+        if (res.ok) setUser(data.user as User);
+        else toast.error(data.message || "Failed to fetch user");
       } catch (err) {
         console.error("Error fetching user:", err);
         toast.error("Error fetching user");
       }
     };
-
     if (token) fetchUser();
   }, [API_URL, token]);
 
   const handleGeneratePDF = async () => {
     try {
+      // Fetch products
       const res = await fetch(`${API_URL}/products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -45,18 +65,23 @@ const AddProductPage = () => {
         return;
       }
 
-      const products = data.products.map((p: any) => ({
+      // Map products to InvoiceProduct
+      const products: InvoiceProduct[] = data.products.map((p: any) => ({
         name: p.name,
         qty: p.quantity,
-        rate: p.price,
+        rate: `₹${p.price.toFixed(2)}`,
         total: `₹${(p.price * p.quantity).toFixed(2)}`,
       }));
 
-      const subtotal = products.reduce((sum, p) => sum + p.rate * p.qty, 0);
+      // Calculate totals
+      const subtotal = products.reduce(
+        (sum: number, p) => sum + parseFloat(p.rate.replace(/₹/, "")) * p.qty,
+        0,
+      );
       const gst = subtotal * 0.18;
       const grandTotal = subtotal + gst;
 
-      const invoice = {
+      const invoice: InvoiceData = {
         name: user?.username || "Unknown User",
         date: new Date().toLocaleDateString("en-GB"),
         email: user?.email || "N/A",
@@ -69,6 +94,7 @@ const AddProductPage = () => {
       setInvoiceData(invoice);
       setShowInvoice(true);
 
+      // Generate PDF
       const pdfRes = await fetch(`${API_URL}/generate-invoice`, {
         method: "POST",
         headers: {
@@ -99,6 +125,7 @@ const AddProductPage = () => {
 
   return (
     <div className="h-screen overflow-auto bg-[#141414] flex flex-col font-poppins relative px-4 lg:px-40 pt-10">
+      {/* Background blur */}
       <div className="absolute inset-0 left-[600px] top-[33.55px] z-10 hidden lg:block">
         <div className="w-[420px] h-[120px] bg-[#4F59A8] rounded-full blur-[100px] opacity-40"></div>
       </div>
