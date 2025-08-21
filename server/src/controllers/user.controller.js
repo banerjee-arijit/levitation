@@ -66,6 +66,29 @@ const loginUser = async (req, res) => {
   }
 };
 
+const getUserDetails = async (req, res) => {
+  try {
+    const existingUser = await user
+      .findById(req.userId)
+      .select("username email");
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: existingUser._id,
+        username: existingUser.username,
+        email: existingUser.email,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 // Logout (stateless JWT; client just deletes token)
 const logoutUser = async (_req, res) => {
   try {
@@ -77,4 +100,4 @@ const logoutUser = async (_req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser };
+export { registerUser, getUserDetails, loginUser, logoutUser };

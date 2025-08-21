@@ -15,6 +15,6 @@ app.use(
 );
 
 app.use("/api/v1", router);
-app.use("/", pdfRouter);
+app.use("/api/v1", pdfRouter);
 
 export default app;

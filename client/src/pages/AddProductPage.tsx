@@ -32,11 +32,8 @@ const AddProductPage = () => {
     if (token) fetchUser();
   }, [API_URL, token]);
 
-  console.log(user);
-
   const handleGeneratePDF = async () => {
     try {
-      // Fetch products from backend
       const res = await fetch(`${API_URL}/products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -46,7 +43,6 @@ const AddProductPage = () => {
         return;
       }
 
-      // Map products into invoice format
       const products = data.products.map((p: any) => ({
         name: p.name,
         qty: p.quantity,
@@ -58,7 +54,6 @@ const AddProductPage = () => {
       const gst = subtotal * 0.18;
       const grandTotal = subtotal + gst;
 
-      // ✅ Create invoice data with user details
       const invoice = {
         name: user?.username || "Unknown User",
         date: new Date().toLocaleDateString("en-GB"),
@@ -69,11 +64,9 @@ const AddProductPage = () => {
         totalAmount: `₹${grandTotal.toFixed(2)}`,
       };
 
-      // Show preview
       setInvoiceData(invoice);
       setShowInvoice(true);
 
-      // Send data to backend for PDF generation
       const pdfRes = await fetch(`${API_URL}/generate-invoice`, {
         method: "POST",
         headers: {
@@ -97,13 +90,12 @@ const AddProductPage = () => {
       }
     } catch (err) {
       console.error("Error generating PDF:", err);
-      alert("Something went wrong while generating PDF");
+      alert("Something went wrong while generating PDF.");
     }
   };
 
   return (
     <div className="h-screen overflow-auto bg-[#141414] flex flex-col font-poppins relative px-4 lg:px-40 pt-10">
-      {/* Background Blur Circle */}
       <div className="absolute inset-0 left-[600px] top-[33.55px] z-10 hidden lg:block">
         <div className="w-[420px] h-[120px] bg-[#4F59A8] rounded-full blur-[100px] opacity-40"></div>
       </div>

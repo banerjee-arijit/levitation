@@ -10,29 +10,29 @@ const Navbar = () => {
     localStorage.removeItem("token");
     setTimeout(() => {
       navigate("/login");
-    }, 1000);
+    }, 800);
   };
 
   return (
-    <header className="flex items-center justify-between bg-[#1F1F1F] h-[64.1px] px-4 sm:px-10 md:px-20 lg:px-40 z-50 w-full">
+    <header className="sticky top-0 flex items-center justify-between bg-[#1F1F1F] h-16 px-4 sm:px-8 md:px-16 lg:px-24 shadow-md z-50 w-full">
       <div className="flex-shrink-0">
         <Logo />
       </div>
 
       {location.pathname === "/login" ? (
-        <Button className="text-[#CCF575] border-2 border-[#CCF575] bg-[#CCF575]/5 px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm">
+        <Button className="text-[#CCF575] border border-[#CCF575] bg-[#CCF575]/10 px-3 sm:px-5 py-1 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 hover:bg-[#CCF575]/20 hover:scale-105">
           Connecting People With Technology
         </Button>
       ) : location.pathname === "/add_product" ? (
         <Button
-          className="h-[36px] sm:h-[41px] w-[70px] sm:w-[90px] rounded-sm bg-[#CCF575] text-[#292C20] text-sm sm:text-base"
+          className="h-9 sm:h-10 px-4 sm:px-6 rounded-md bg-[#CCF575] text-[#1F1F1F] text-xs sm:text-sm md:text-base font-semibold shadow-md transition-all duration-300 hover:bg-[#b5e74a] hover:scale-105"
           onClick={handleLogout}
         >
           Logout
         </Button>
       ) : (
         <Link to="/login">
-          <Button className="h-[36px] sm:h-[41px] w-[56px] sm:w-[78px] rounded-sm bg-[#CCF575] text-[#292C20] text-sm sm:text-base">
+          <Button className="h-9 sm:h-10 px-4 sm:px-6 rounded-md bg-[#CCF575] text-[#1F1F1F] text-xs sm:text-sm md:text-base font-semibold shadow-md transition-all duration-300 hover:bg-[#b5e74a] hover:scale-105">
             Login
           </Button>
         </Link>
