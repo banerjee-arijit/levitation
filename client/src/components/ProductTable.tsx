@@ -1,56 +1,61 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
-const ProductTable = () => {
+type Product = {
+  _id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  createdAt: string;
+};
+
+export default function ProductTable() {
+  const [rows, setRows] = useState<Product[]>([]);
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const fetchProducts = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const res = await fetch(`${API_URL}/products`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (res.ok) setRows(data.products || []);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
-    <div className="overflow-x-auto w-full rounded-md border border-[#424647]">
-      <table className="min-w-[600px] sm:min-w-full text-white text-sm font-poppins">
-        <thead className="bg-white">
+    <div className="overflow-x-auto border border-[#424647] rounded">
+      <table className="min-w-full text-left">
+        <thead className="bg-[#202020] text-white">
           <tr>
-            <th className="px-6 py-3 border-b border-[#424647] text-black font-medium text-left">
-              Product Name
-            </th>
-            <th className="px-6 py-3 border-b border-[#424647] text-black font-medium text-left">
-              Price
-            </th>
-            <th className="px-6 py-3 border-b border-[#424647] text-black font-medium text-left">
-              Quantity
-            </th>
-            <th className="px-6 py-3 border-b border-[#424647] text-black font-medium text-left">
-              Total Price
-            </th>
+            <th className="px-4 py-3">Name</th>
+            <th className="px-4 py-3">Price</th>
+            <th className="px-4 py-3">Quantity</th>
+            <th className="px-4 py-3">Created</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td className="px-6 py-3 border-b border-[#424647]">(Productname-1)</td>
-            <td className="px-6 py-3 border-b border-[#424647]">5</td>
-            <td className="px-6 py-3 border-b border-[#424647]">10</td>
-            <td className="px-6 py-3 border-b border-[#424647]">INR 50</td>
-          </tr>
-          <tr>
-            <td className="px-6 py-3 border-b border-[#424647]">(Productname-2)</td>
-            <td className="px-6 py-3 border-b border-[#424647]">2</td>
-            <td className="px-6 py-3 border-b border-[#424647]">10</td>
-            <td className="px-6 py-3 border-b border-[#424647]">INR 20</td>
-          </tr>
+        <tbody className="text-[#E5E5E5]">
+          {rows.map((p) => (
+            <tr key={p._id} className="border-t border-[#424647]">
+              <td className="px-4 py-3">{p.name}</td>
+              <td className="px-4 py-3">₹{p.price}</td>
+              <td className="px-4 py-3">{p.quantity}</td>
+              <td className="px-4 py-3">{new Date(p.createdAt).toLocaleString()}</td>
+            </tr>
+          ))}
+          {rows.length === 0 && (
+            <tr>
+              <td className="px-4 py-6 text-[#A7A7A7]" colSpan={4}>
+                No products yet.
+              </td>
+            </tr>
+          )}
         </tbody>
-        <tfoot className="bg-[#202020] font-semibold">
-          <tr>
-            <td colSpan={3} className="px-6 py-3 text-right border-t border-[#424647]">
-              Sub-Total
-            </td>
-            <td className="px-6 py-3 border-t border-[#424647]">INR 82.6</td>
-          </tr>
-          <tr>
-            <td colSpan={3} className="px-6 py-3 text-right border-t border-[#424647]">
-              Incl + GST 18%
-            </td>
-            <td className="px-6 py-3 border-t border-[#424647]">INR 82.6</td>
-          </tr>
-        </tfoot>
       </table>
     </div>
   );
-};
-
-export default ProductTable;
+}

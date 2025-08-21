@@ -5,18 +5,48 @@ import { CirclePlus } from "lucide-react";
 import ProductTable from "@/components/ProductTable";
 
 const AddProductPage = () => {
-  const [product, setProduct] = useState({
-    name: "",
-    price: "",
-    category: "",
-  });
+  const [product, setProduct] = useState({ name: "", price: "", quantity: "1" });
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProduct({ ...product, [e.target.id.replace("product-", "")]: e.target.value });
+    setProduct((prev) => ({ ...prev, [e.target.id.replace("product-", "")]: e.target.value }));
   };
 
-  const handleAddProduct = () => {
-    console.log("Adding product:", product);
+  const handleAddProduct = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Please login again");
+
+    const name = product.name.trim();
+    const price = Number(product.price);
+    const quantity = Number(product.quantity || "1");
+
+    if (!name) return alert("Product name required");
+    if (isNaN(price) || price < 0) return alert("Invalid price");
+    if (isNaN(quantity) || quantity < 1) return alert("Invalid quantity");
+
+    try {
+      const res = await fetch(`${API_URL}/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, price, quantity }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Product added");
+        // reset form
+        setProduct({ name: "", price: "", quantity: "1" });
+        // soft refresh of table: simplest is reload
+        window.location.reload();
+      } else {
+        alert(data.message || "Failed to add");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
   };
 
   const handleGeneratePDF = () => {
@@ -59,13 +89,13 @@ const AddProductPage = () => {
             />
           </div>
           <div>
-            <p className="mb-2">Product Category</p>
+            <p className="mb-2">Quantity</p>
             <Input
-              id="product-category"
-              type="text"
-              value={product.category}
+              id="product-quantity"
+              type="number"
+              value={product.quantity}
               onChange={handleChange}
-              placeholder="Enter product category"
+              placeholder="Enter quantity"
               className="w-full h-[56px] bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4 focus:ring-2 focus:ring-[#CCF575] focus:border-[#CCF575]"
             />
           </div>

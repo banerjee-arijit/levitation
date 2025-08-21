@@ -3,16 +3,12 @@ import loginImage from "@/assets/loginPageImage.png";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link, Meta } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const RegistrationPage = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const API_URL = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -25,25 +21,13 @@ const RegistrationPage = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
-    if (!nameRegex.test(formData.name)) {
-      alert("Please enter a valid name (only letters, 2-30 characters).");
-      return;
-    }
-
-    if (!emailRegex.test(formData.email)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-
-    if (!passwordRegex.test(formData.password)) {
-      alert(
-        "Password must be at least 6 characters long and include at least 1 letter and 1 number.",
-      );
-      return;
-    }
+    if (!nameRegex.test(formData.name)) return alert("Enter a valid name (letters, 2-30 chars).");
+    if (!emailRegex.test(formData.email)) return alert("Enter a valid email.");
+    if (!passwordRegex.test(formData.password))
+      return alert("Password: min 6 chars, 1 letter, 1 number.");
 
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -53,15 +37,15 @@ const RegistrationPage = () => {
         }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(data.message);
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "Registered");
+        navigate("/login");
       } else {
-        alert(data.message);
+        alert(data.message || "Failed");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       alert("Something went wrong. Please try again.");
     }
   };
@@ -78,7 +62,7 @@ const RegistrationPage = () => {
             <div className="text-white mb-6">
               <h3 className="text-3xl mb-3 font-bold">Sign up to begin journey</h3>
               <p className="text-[#A7A7A7] leading-relaxed">
-                This is a basic signup page which is used for levitation assignment purpose.
+                This is a basic signup page used for the assignment.
               </p>
             </div>
             <form className="space-y-6 z-50" onSubmit={handleRegister}>
@@ -94,9 +78,6 @@ const RegistrationPage = () => {
                   onChange={handleChange}
                   className="w-full h-[56px] mt-2 bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4"
                 />
-                <p className="text-[#B8B8B8] mt-2 text-sm">
-                  This name will be displayed with your inquiry
-                </p>
               </div>
               <div>
                 <Label htmlFor="email" className="text-white text-sm">
@@ -110,9 +91,6 @@ const RegistrationPage = () => {
                   onChange={handleChange}
                   className="w-full h-[56px] mt-2 bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4"
                 />
-                <p className="text-[#B8B8B8] mt-2 text-sm">
-                  This email will be displayed with your inquiry
-                </p>
               </div>
               <div>
                 <Label htmlFor="password" className="text-white text-sm">
@@ -126,9 +104,6 @@ const RegistrationPage = () => {
                   onChange={handleChange}
                   className="w-full h-[56px] mt-2 bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4"
                 />
-                <p className="text-[#B8B8B8] mt-2 text-sm">
-                  Any further updates will be forwarded on this Email ID
-                </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
                 <Button
@@ -147,7 +122,6 @@ const RegistrationPage = () => {
             </div>
           </div>
 
-          {/* Registration page image  */}
           <div className="relative left-0 md:left-82 w-full md:w-[900px] md:block hidden h-[733px] bg-gray-800 rounded-l-3xl overflow-hidden z-50">
             <img src={loginImage} alt="login" className="w-full h-full object-cover" />
           </div>
