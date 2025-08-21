@@ -8,6 +8,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint .",
+    "build": "vite build",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "keywords": [
