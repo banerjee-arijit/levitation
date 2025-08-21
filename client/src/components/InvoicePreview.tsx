@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
+import { toast } from "react-hot-toast";
 
 export interface Product {
   name: string;
@@ -25,19 +26,28 @@ interface InvoicePreviewProps {
 
 const InvoicePreview = ({ data, onClose }: InvoicePreviewProps) => {
   const { name, date, email, products, totalCharges, gst, totalAmount } = data;
-
   const API_URL = import.meta.env.VITE_API_URL;
-
-  //get the token from the localstorage
   const token = localStorage.getItem("token");
 
-  // Here is the handle PDF downloding function
   const handleDownload = async () => {
     try {
       const invoiceElement = document.getElementById("invoice");
       if (!invoiceElement) return;
 
-      const html = invoiceElement.outerHTML;
+      const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Invoice</title>
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-white p-6">
+          ${invoiceElement.outerHTML}
+        </body>
+        </html>
+      `;
 
       const res = await fetch(`${API_URL}/generate-invoice`, {
         method: "POST",
@@ -58,18 +68,19 @@ const InvoicePreview = ({ data, onClose }: InvoicePreviewProps) => {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+        toast.success("PDF downloaded successfully!");
       } else {
         const err = await res.json();
-        alert(err.message || "Failed to download invoice");
+        toast.error(err.message || "Failed to download invoice");
       }
     } catch (error) {
       console.error("Download error:", error);
-      alert("Something went wrong while downloading PDF");
+      toast.error("Something went wrong while downloading PDF");
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 pt-10 mt-5">
       <div className="bg-white rounded-lg w-full max-w-3xl h-full md:h-[90vh] overflow-auto relative shadow-xl">
         <button
           onClick={onClose}
@@ -79,6 +90,7 @@ const InvoicePreview = ({ data, onClose }: InvoicePreviewProps) => {
         </button>
 
         <div id="invoice" className="p-6 sm:p-8 font-poppins text-black">
+          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-4 gap-3">
             <div className="flex items-center gap-2">
               <span className="text-[#303661] font-bold text-2xl">Levitation</span>
@@ -89,6 +101,7 @@ const InvoicePreview = ({ data, onClose }: InvoicePreviewProps) => {
 
           <hr className="border-0 h-1 bg-[#303661] my-5" />
 
+          {/* User Info */}
           <div className="bg-[#141414] text-white p-5 rounded-lg mb-7 flex flex-col sm:flex-row justify-between gap-4">
             <div>
               <p className="text-[#CCF575] uppercase text-xs tracking-wide m-0">Name</p>
@@ -102,6 +115,7 @@ const InvoicePreview = ({ data, onClose }: InvoicePreviewProps) => {
             </div>
           </div>
 
+          {/* Products Table */}
           <div className="overflow-x-auto">
             <table className="w-full border-collapse mb-7 rounded-lg overflow-hidden shadow-sm min-w-[500px]">
               <thead>
@@ -125,6 +139,7 @@ const InvoicePreview = ({ data, onClose }: InvoicePreviewProps) => {
             </table>
           </div>
 
+          {/* Totals */}
           <div className="bg-gray-100 p-5 rounded-lg w-full sm:w-max ml-auto shadow-inner">
             <div className="flex justify-between mb-2 min-w-[240px]">
               <span>Total Charges</span>

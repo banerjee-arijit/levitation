@@ -2,26 +2,38 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CirclePlus } from "lucide-react";
+import { toast } from "react-hot-toast";
 
-const ProductForm = () => {
-  const [product, setProduct] = useState({ name: "", price: "", quantity: "1" });
+interface Product {
+  name: string;
+  price: string;
+  quantity: string;
+}
+
+interface ProductFormProps {
+  onProductAdded?: () => void;
+}
+
+const ProductForm: React.FC<ProductFormProps> = ({ onProductAdded }) => {
+  const [product, setProduct] = useState<Product>({ name: "", price: "", quantity: "1" });
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const handleChange = (e) => {
-    setProduct((prev) => ({ ...prev, [e.target.id.replace("product-", "")]: e.target.value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const key = e.target.id.replace("product-", "");
+    setProduct((prev) => ({ ...prev, [key]: e.target.value }));
   };
 
   const handleAddProduct = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return alert("Please login again");
+    if (!token) return toast.error("Please login again");
 
     const name = product.name.trim();
     const price = Number(product.price);
     const quantity = Number(product.quantity || "1");
 
-    if (!name) return alert("Product name required");
-    if (isNaN(price) || price < 0) return alert("Invalid price");
-    if (isNaN(quantity) || quantity < 1) return alert("Invalid quantity");
+    if (!name) return toast.error("Product name required");
+    if (isNaN(price) || price < 0) return toast.error("Product price required");
+    if (isNaN(quantity) || quantity < 1) return toast.error("Product quantity required");
 
     try {
       const res = await fetch(`${API_URL}/products`, {
@@ -32,17 +44,19 @@ const ProductForm = () => {
         },
         body: JSON.stringify({ name, price, quantity }),
       });
+
       const data = await res.json();
+
       if (res.ok) {
-        alert("✅ Product added successfully!");
+        toast.success("Product added successfully");
         setProduct({ name: "", price: "", quantity: "1" });
-        window.location.reload();
+        if (onProductAdded) onProductAdded();
       } else {
-        alert(data.message || "Failed to add");
+        toast.error(data.message || "Failed to add product");
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      toast.error("Something went wrong");
     }
   };
 

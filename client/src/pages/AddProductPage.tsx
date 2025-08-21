@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import ProductForm from "@/components/ProductForm";
 import ProductTable from "@/components/ProductTable";
 import InvoicePreview from "@/components/InvoicePreview";
@@ -22,10 +23,11 @@ const AddProductPage = () => {
         if (res.ok) {
           setUser(data.user);
         } else {
-          console.error(data.message || "Failed to fetch user");
+          toast.error(data.message || "Failed to fetch user");
         }
       } catch (err) {
         console.error("Error fetching user:", err);
+        toast.error("Error fetching user");
       }
     };
 
@@ -39,7 +41,7 @@ const AddProductPage = () => {
       });
       const data = await res.json();
       if (!res.ok || !data.products) {
-        alert(data.message || "No products found");
+        toast.error(data.message || "No products found");
         return;
       }
 
@@ -84,13 +86,14 @@ const AddProductPage = () => {
         a.download = "invoice.pdf";
         a.click();
         window.URL.revokeObjectURL(url);
+        toast.success("Invoice PDF generated successfully!");
       } else {
         const errorData = await pdfRes.json();
-        alert(errorData.error || "Failed to generate PDF");
+        toast.error(errorData.error || "Failed to generate PDF");
       }
     } catch (err) {
       console.error("Error generating PDF:", err);
-      alert("Something went wrong while generating PDF.");
+      toast.error("Something went wrong while generating PDF.");
     }
   };
 

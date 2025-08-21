@@ -6,22 +6,18 @@ const pdfRouter = express.Router();
 pdfRouter.post("/generate-invoice", async (req, res) => {
   try {
     const { html } = req.body;
-
-    if (!html) {
+    if (!html)
       return res.status(400).json({ error: "HTML content is required" });
-    }
 
-    // Launch Chromium bundled with puppeteer
     const browser = await puppeteer.launch({
       headless: "new",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
     const page = await browser.newPage();
 
-    // Set the content from request
     await page.setContent(html, { waitUntil: "networkidle0" });
 
-    // Generate PDF buffer
+    // Generate PDF with full styling
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
@@ -29,7 +25,6 @@ pdfRouter.post("/generate-invoice", async (req, res) => {
 
     await browser.close();
 
-    // Send PDF as response
     res.set({
       "Content-Type": "application/pdf",
       "Content-Disposition": "attachment; filename=invoice.pdf",

@@ -51,15 +51,15 @@ const LoginPage = () => {
       if (response.ok) {
         localStorage.setItem("token", data.token);
 
-        const decoded: any = jwtDecode(data.token); // decode JWT
+        const decoded: any = jwtDecode(data.token);
         const user = {
           id: decoded.id,
           email: decoded.email,
         };
+        localStorage.setItem("user", JSON.stringify(user));
 
-        localStorage.setItem("user", JSON.stringify(user)); // store user info
         toast.success("Login Successful");
-        setTimeout(() => navigate("/add_product"), 8000);
+        setTimeout(() => navigate("/add_product"), 1000);
       } else {
         toast.error(data.message || "Login failed");
       }
@@ -71,7 +71,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#141414] flex flex-col font-poppins relative">
-      <Toaster position="top-right" />
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="flex flex-1 items-center justify-center px-4 md:px-10">
         <div className="flex flex-col lg:flex-row items-center gap-12 w-full max-w-[1280px]">
           <div className="relative w-full lg:w-[700px] h-[500px] md:h-[733px] bg-gray-800 rounded-2xl overflow-hidden z-50 mt-10 md:mt-0">
@@ -135,7 +135,7 @@ const LoginPage = () => {
                 >
                   Login
                 </Button>
-                <Link to="/register" className="text-[#B8B8B8] text-sm hover:text-white">
+                <Link to="/" className="text-[#B8B8B8] text-sm hover:text-white">
                   Create account
                 </Link>
               </div>
