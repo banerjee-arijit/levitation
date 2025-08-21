@@ -1,60 +1,109 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { CirclePlus } from "lucide-react";
+import { useState, useEffect } from "react";
+import ProductForm from "@/components/ProductForm";
 import ProductTable from "@/components/ProductTable";
+import InvoicePreview from "@/components/InvoicePreview";
+import { Button } from "@/components/ui/button";
 
 const AddProductPage = () => {
-  const [product, setProduct] = useState({ name: "", price: "", quantity: "1" });
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+
   const API_URL = import.meta.env.VITE_API_URL;
+  const token = localStorage.getItem("token");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProduct((prev) => ({ ...prev, [e.target.id.replace("product-", "")]: e.target.value }));
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`${API_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setUser(data.user);
+        } else {
+          console.error(data.message || "Failed to fetch user");
+        }
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
 
-  const handleAddProduct = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Please login again");
+    if (token) fetchUser();
+  }, [API_URL, token]);
 
-    const name = product.name.trim();
-    const price = Number(product.price);
-    const quantity = Number(product.quantity || "1");
+  console.log(user);
 
-    if (!name) return alert("Product name required");
-    if (isNaN(price) || price < 0) return alert("Invalid price");
-    if (isNaN(quantity) || quantity < 1) return alert("Invalid quantity");
-
+  const handleGeneratePDF = async () => {
     try {
+      // Fetch products from backend
       const res = await fetch(`${API_URL}/products`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok || !data.products) {
+        alert(data.message || "No products found");
+        return;
+      }
+
+      // Map products into invoice format
+      const products = data.products.map((p: any) => ({
+        name: p.name,
+        qty: p.quantity,
+        rate: p.price,
+        total: `₹${(p.price * p.quantity).toFixed(2)}`,
+      }));
+
+      const subtotal = products.reduce((sum, p) => sum + p.rate * p.qty, 0);
+      const gst = subtotal * 0.18;
+      const grandTotal = subtotal + gst;
+
+      // ✅ Create invoice data with user details
+      const invoice = {
+        name: user?.username || "Unknown User",
+        date: new Date().toLocaleDateString("en-GB"),
+        email: user?.email || "N/A",
+        products,
+        totalCharges: `₹${subtotal.toFixed(2)}`,
+        gst: `₹${gst.toFixed(2)}`,
+        totalAmount: `₹${grandTotal.toFixed(2)}`,
+      };
+
+      // Show preview
+      setInvoiceData(invoice);
+      setShowInvoice(true);
+
+      // Send data to backend for PDF generation
+      const pdfRes = await fetch(`${API_URL}/generate-invoice`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, price, quantity }),
+        body: JSON.stringify({ invoiceData: invoice }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        alert("Product added");
-        // reset form
-        setProduct({ name: "", price: "", quantity: "1" });
-        // soft refresh of table: simplest is reload
-        window.location.reload();
+
+      if (pdfRes.ok) {
+        const pdfBlob = await pdfRes.blob();
+        const url = window.URL.createObjectURL(pdfBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "invoice.pdf";
+        a.click();
+        window.URL.revokeObjectURL(url);
       } else {
-        alert(data.message || "Failed to add");
+        const errorData = await pdfRes.json();
+        alert(errorData.error || "Failed to generate PDF");
       }
     } catch (err) {
-      console.error(err);
-      alert("Something went wrong");
+      console.error("Error generating PDF:", err);
+      alert("Something went wrong while generating PDF");
     }
-  };
-
-  const handleGeneratePDF = () => {
-    console.log("Generate PDF Invoice");
   };
 
   return (
     <div className="h-screen overflow-auto bg-[#141414] flex flex-col font-poppins relative px-4 lg:px-40 pt-10">
+      {/* Background Blur Circle */}
       <div className="absolute inset-0 left-[600px] top-[33.55px] z-10 hidden lg:block">
         <div className="w-[420px] h-[120px] bg-[#4F59A8] rounded-full blur-[100px] opacity-40"></div>
       </div>
@@ -65,51 +114,7 @@ const AddProductPage = () => {
           <p className="text-[#A7A7A7]">Fill the details below to add a new product.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-white">
-          <div>
-            <p className="mb-2">Product Name</p>
-            <Input
-              id="product-name"
-              type="text"
-              value={product.name}
-              onChange={handleChange}
-              placeholder="Enter product name"
-              className="w-full h-[56px] bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4 focus:ring-2 focus:ring-[#CCF575] focus:border-[#CCF575]"
-            />
-          </div>
-          <div>
-            <p className="mb-2">Product Price</p>
-            <Input
-              id="product-price"
-              type="number"
-              value={product.price}
-              onChange={handleChange}
-              placeholder="Enter product price"
-              className="w-full h-[56px] bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4 focus:ring-2 focus:ring-[#CCF575] focus:border-[#CCF575]"
-            />
-          </div>
-          <div>
-            <p className="mb-2">Quantity</p>
-            <Input
-              id="product-quantity"
-              type="number"
-              value={product.quantity}
-              onChange={handleChange}
-              placeholder="Enter quantity"
-              className="w-full h-[56px] bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4 focus:ring-2 focus:ring-[#CCF575] focus:border-[#CCF575]"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-center mt-10">
-          <Button
-            onClick={handleAddProduct}
-            className="text-[#CCF575] bg-[#303030] w-full sm:w-[156px] h-[45px] rounded-sm flex items-center gap-2 hover:bg-[#CCF575] hover:text-[#141414] transition-all duration-300"
-          >
-            Add Product <CirclePlus size={18} />
-          </Button>
-        </div>
-
+        <ProductForm />
         <div className="mt-10 overflow-auto">
           <ProductTable />
         </div>
@@ -122,6 +127,10 @@ const AddProductPage = () => {
             Generate PDF Invoice
           </Button>
         </div>
+
+        {showInvoice && invoiceData && (
+          <InvoicePreview data={invoiceData} onClose={() => setShowInvoice(false)} />
+        )}
       </div>
     </div>
   );

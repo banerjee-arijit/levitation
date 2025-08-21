@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import sliderImageOne from "@/assets/sliderImageOne.png";
 import sliderImageTwo from "@/assets/sliderImageTwo.png";
+import { jwtDecode } from "jwt-decode";
 
 const images = [sliderImageOne, sliderImageTwo];
 
@@ -49,8 +50,16 @@ const LoginPage = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+
+        const decoded: any = jwtDecode(data.token); // decode JWT
+        const user = {
+          id: decoded.id,
+          email: decoded.email,
+        };
+
+        localStorage.setItem("user", JSON.stringify(user)); // store user info
         toast.success("Login Successful");
-        setTimeout(() => navigate("/add_product"), 800);
+        setTimeout(() => navigate("/add_product"), 8000);
       } else {
         toast.error(data.message || "Login failed");
       }
