@@ -3,6 +3,7 @@ import Layout from "@/layout/Layout";
 import RegistrationPage from "@/pages/RegistrationPage";
 import LoginPage from "@/pages/LoginPage";
 import AddProductPage from "@/pages/AddProductPage";
+import ProtectedRoute from "./ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +20,11 @@ const router = createBrowserRouter([
       },
       {
         path: "add_product",
-        element: <AddProductPage />,
+        element: (
+          <ProtectedRoute>
+            <AddProductPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

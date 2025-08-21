@@ -1,11 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import { Toaster, toast } from "react-hot-toast";
 import sliderImageOne from "@/assets/sliderImageOne.png";
 import sliderImageTwo from "@/assets/sliderImageTwo.png";
+=======
+import sliderImageOne from "@/assets/sliderImageOne.png";
+import sliderImageTwo from "@/assets/sliderImageTwo.png";
+import { Toaster, toast } from "react-hot-toast";
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
 
 const images = [sliderImageOne, sliderImageTwo];
 
@@ -17,7 +23,13 @@ const LoginPage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+<<<<<<< HEAD
     if (token) navigate("/add_product");
+=======
+    if (token) {
+      navigate("/add_product");
+    }
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
   }, [navigate]);
 
   useEffect(() => {
@@ -36,7 +48,11 @@ const LoginPage = () => {
 
     if (!emailRegex.test(formData.email)) return toast.error("Invalid email");
     if (!passwordRegex.test(formData.password))
+<<<<<<< HEAD
       return toast.error("Password must be at least 6 chars, 1 letter & 1 number");
+=======
+      return toast.error("Password must be at least 6 characters, 1 letter & 1 number");
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
 
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
@@ -49,10 +65,19 @@ const LoginPage = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+<<<<<<< HEAD
         toast.success("Login Successful");
         setTimeout(() => navigate("/add_product"), 800);
       } else {
         toast.error(data.message || "Login failed");
+=======
+        toast.success("login Successfull");
+        setTimeout(() => {
+          navigate("/add_product");
+        }, 2000);
+      } else {
+        toast.error(data.message);
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
       }
     } catch (err) {
       console.error(err);
@@ -62,9 +87,27 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#141414] flex flex-col font-poppins relative">
+<<<<<<< HEAD
       <Toaster position="top-right" />
       <div className="flex flex-1 items-center justify-center px-4 md:px-10">
         <div className="flex flex-col lg:flex-row items-center gap-12 w-full max-w-[1280px]">
+=======
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: "",
+          duration: 5000,
+          removeDelay: 1000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+        }}
+      />
+      <div className="flex flex-1 items-center justify-center px-4 md:px-10">
+        <div className="flex flex-col lg:flex-row items-center gap-12 w-full max-w-[1280px]">
+          {/* Slider */}
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
           <div className="relative w-full lg:w-[700px] h-[500px] md:h-[733px] bg-gray-800 rounded-2xl overflow-hidden z-50 mt-10 md:mt-0">
             <img
               src={images[current]}
@@ -126,8 +169,13 @@ const LoginPage = () => {
                 >
                   Login
                 </Button>
+<<<<<<< HEAD
                 <Link to="/register" className="text-[#B8B8B8] text-sm hover:text-white">
                   Create account
+=======
+                <Link to="/forgot-password" className="text-[#B8B8B8] text-sm hover:text-white">
+                  Forget password?
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
                 </Link>
               </div>
             </form>

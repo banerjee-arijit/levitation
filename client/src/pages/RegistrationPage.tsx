@@ -1,12 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import loginImage from "@/assets/loginPageImage.png";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+=======
+import { Toaster, toast } from "react-hot-toast";
+
+const RegistrationPage = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/add_product");
+    }
+  }, [navigate]);
+
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
@@ -21,10 +41,27 @@ const RegistrationPage = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
+<<<<<<< HEAD
     if (!nameRegex.test(formData.name)) return alert("Enter a valid name (letters, 2-30 chars).");
     if (!emailRegex.test(formData.email)) return alert("Enter a valid email.");
     if (!passwordRegex.test(formData.password))
       return alert("Password: min 6 chars, 1 letter, 1 number.");
+=======
+    if (!nameRegex.test(formData.name)) {
+      toast.error("Please enter a valid name (2-30 letters only).");
+      return;
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      toast.error("Password must be at least 6 characters and include 1 letter and 1 number.");
+      return;
+    }
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
 
     try {
       const res = await fetch(`${API_URL}/auth/register`, {
@@ -37,6 +74,7 @@ const RegistrationPage = () => {
         }),
       });
 
+<<<<<<< HEAD
       const data = await res.json();
       if (res.ok) {
         alert(data.message || "Registered");
@@ -47,15 +85,41 @@ const RegistrationPage = () => {
     } catch (err) {
       console.error(err);
       alert("Something went wrong. Please try again.");
+=======
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Registration Completed Please Login");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
     }
   };
 
   return (
     <div className="h-screen overflow-hidden bg-[#141414] flex flex-col font-poppins relative md:m-0 mt-20">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: "",
+          duration: 5000,
+          removeDelay: 1000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+        }}
+      />
       <div className="absolute inset-0 left-[1050px] top-[143.55px] z-10">
         <div className="w-[420px] h-[120px] bg-[#CCF575] rounded-full blur-[160px] opacity-60"></div>
       </div>
-
       <div className="flex flex-1 items-center justify-center px-4 md:px-10">
         <div className="flex flex-col md:flex-row items-center w-full max-w-[1280px]">
           <div className="w-full md:w-[496px]">
@@ -65,6 +129,7 @@ const RegistrationPage = () => {
                 This is a basic signup page used for the assignment.
               </p>
             </div>
+
             <form className="space-y-6 z-50" onSubmit={handleRegister}>
               <div>
                 <Label htmlFor="name" className="text-white text-sm">
@@ -79,6 +144,7 @@ const RegistrationPage = () => {
                   className="w-full h-[56px] mt-2 bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4"
                 />
               </div>
+
               <div>
                 <Label htmlFor="email" className="text-white text-sm">
                   Email Address
@@ -92,6 +158,7 @@ const RegistrationPage = () => {
                   className="w-full h-[56px] mt-2 bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4"
                 />
               </div>
+
               <div>
                 <Label htmlFor="password" className="text-white text-sm">
                   Password
@@ -105,6 +172,7 @@ const RegistrationPage = () => {
                   className="w-full h-[56px] mt-2 bg-[#202020] border border-[#424647] text-white placeholder:text-[#7C7C7C] rounded-[4px] px-4"
                 />
               </div>
+
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
                 <Button
                   type="submit"
@@ -117,11 +185,16 @@ const RegistrationPage = () => {
                 </Link>
               </div>
             </form>
+
             <div className="absolute left-0 inset-0 top-[790px] z-10">
               <div className="w-[220px] h-[220px] left-6 bg-[#CCF575] rounded-full blur-[160px] opacity-60"></div>
             </div>
           </div>
 
+<<<<<<< HEAD
+=======
+          {/* Registration page image */}
+>>>>>>> c452ebe45d16d5d644562336bbb401d2674d1104
           <div className="relative left-0 md:left-82 w-full md:w-[900px] md:block hidden h-[733px] bg-gray-800 rounded-l-3xl overflow-hidden z-50">
             <img src={loginImage} alt="login" className="w-full h-full object-cover" />
           </div>
