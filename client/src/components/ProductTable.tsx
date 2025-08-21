@@ -27,6 +27,11 @@ export default function ProductTable() {
     fetchProducts();
   }, []);
 
+  // subtotal calculation
+  const subtotal = rows.reduce((sum, p) => sum + p.price * p.quantity, 0);
+  const gst = subtotal * 0.18;
+  const grandTotal = subtotal + gst;
+
   return (
     <div className="overflow-x-auto border border-[#424647] rounded">
       <table className="min-w-full text-left">
@@ -36,6 +41,7 @@ export default function ProductTable() {
             <th className="px-4 py-3">Price</th>
             <th className="px-4 py-3">Quantity</th>
             <th className="px-4 py-3">Created</th>
+            <th className="px-4 py-3">Total</th>
           </tr>
         </thead>
         <tbody className="text-[#E5E5E5]">
@@ -45,11 +51,37 @@ export default function ProductTable() {
               <td className="px-4 py-3">₹{p.price}</td>
               <td className="px-4 py-3">{p.quantity}</td>
               <td className="px-4 py-3">{new Date(p.createdAt).toLocaleString()}</td>
+              <td className="px-4 py-3">₹{p.price * p.quantity}</td>
             </tr>
           ))}
+
+          {/* Summary Rows */}
+          {rows.length > 0 && (
+            <>
+              <tr className="border-t border-[#424647] font-semibold">
+                <td colSpan={4} className="px-4 py-3 text-right">
+                  Subtotal
+                </td>
+                <td className="px-4 py-3">₹{subtotal.toFixed(2)}</td>
+              </tr>
+              <tr className="border-t border-[#424647] font-semibold">
+                <td colSpan={4} className="px-4 py-3 text-right">
+                  GST (18%)
+                </td>
+                <td className="px-4 py-3">₹{gst.toFixed(2)}</td>
+              </tr>
+              <tr className="border-t border-[#424647] font-bold">
+                <td colSpan={4} className="px-4 py-3 text-right">
+                  Grand Total
+                </td>
+                <td className="px-4 py-3">₹{grandTotal.toFixed(2)}</td>
+              </tr>
+            </>
+          )}
+
           {rows.length === 0 && (
             <tr>
-              <td className="px-4 py-6 text-[#A7A7A7]" colSpan={4}>
+              <td className="px-4 py-6 text-[#A7A7A7]" colSpan={5}>
                 No products yet.
               </td>
             </tr>

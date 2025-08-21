@@ -1,8 +1,6 @@
 import Logo from "./shared/Logo";
 import { Button } from "./ui/button";
-import { useLocation } from "react-router-dom";
-import { Link, useNavigate } from "react-router-dom";
-import { Toaster, toast } from "react-hot-toast";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 
 const Navbar = () => {
   const location = useLocation();
@@ -10,7 +8,6 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    toast.success("logout Successfull");
     setTimeout(() => {
       navigate("/login");
     }, 1000);
@@ -18,18 +15,6 @@ const Navbar = () => {
 
   return (
     <header className="flex items-center justify-between bg-[#1F1F1F] h-[64.1px] px-4 sm:px-10 md:px-20 lg:px-40 z-50 w-full">
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          className: "",
-          duration: 5000,
-          removeDelay: 1000,
-          style: {
-            background: "#363636",
-            color: "#fff",
-          },
-        }}
-      />
       <div className="flex-shrink-0">
         <Logo />
       </div>
@@ -46,7 +31,7 @@ const Navbar = () => {
           Logout
         </Button>
       ) : (
-        <Link to={"/login"}>
+        <Link to="/login">
           <Button className="h-[36px] sm:h-[41px] w-[56px] sm:w-[78px] rounded-sm bg-[#CCF575] text-[#292C20] text-sm sm:text-base">
             Login
           </Button>
