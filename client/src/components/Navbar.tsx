@@ -1,13 +1,35 @@
 import Logo from "./shared/Logo";
 import { Button } from "./ui/button";
 import { useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("logout Successfull");
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+  };
 
   return (
     <header className="flex items-center justify-between bg-[#1F1F1F] h-[64.1px] px-4 sm:px-10 md:px-20 lg:px-40 z-50 w-full">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: "",
+          duration: 5000,
+          removeDelay: 1000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+        }}
+      />
       <div className="flex-shrink-0">
         <Logo />
       </div>
@@ -17,7 +39,10 @@ const Navbar = () => {
           Connecting People With Technology
         </Button>
       ) : location.pathname === "/add_product" ? (
-        <Button className="h-[36px] sm:h-[41px] w-[70px] sm:w-[90px] rounded-sm bg-[#CCF575] text-[#292C20] text-sm sm:text-base">
+        <Button
+          className="h-[36px] sm:h-[41px] w-[70px] sm:w-[90px] rounded-sm bg-[#CCF575] text-[#292C20] text-sm sm:text-base"
+          onClick={handleLogout}
+        >
           Logout
         </Button>
       ) : (
