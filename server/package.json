@@ -30,6 +30,7 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "merge-descriptors": "^2.0.0",
     "mongoose": "^8.17.2",
     "puppeteer": "^24.17.0"
   },
